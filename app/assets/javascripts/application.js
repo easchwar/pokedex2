@@ -15,6 +15,7 @@
 //= require jquery.serializejson.min
 //= require underscore
 //= require backbone
+//= require typeahead.bundle
 //= require pokedex-0
 //= require pokedex-1A
 //= require pokedex-1B

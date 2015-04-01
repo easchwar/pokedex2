@@ -1,51 +1,61 @@
 Pokedex.Views = {}
 
 Pokedex.Views.PokemonIndex = Backbone.View.extend({
-  // tagName: "li",
-  //
-  // className: "backbone-el",
-  //
-  // attrs: {
-  // },
-
   events: {
-     "click li": "selectPokemonFromList"
+     "click li": "selectPokemonFromList",
+     "keyup .search": "updateSearchParams"
   },
 
   initialize: function () {
     this.collection = new Pokedex.Collections.Pokemon();
+    this.$el.append('<input class="search" type="text">');
+    this.$el.append('<div class="inner-list">');
     this.listenTo(this.collection, 'sync add', this.render);
   },
 
   addPokemonToList: function (pokemon) {
     var content = window.JST["pokemonListItem"]({pokemon: pokemon});
-    this.$el.append(content);
+    this.$el.find('.inner-list').append(content);
   },
 
-  refreshPokemon: function (callback) {
+  refreshPokemon: function (searchString, callback) {
     this.collection.fetch({
       success: function() {
-        this.render();
+        debugger
+        this.render({searchString: searchString});
         callback && callback();
       }.bind(this)
     });
   },
 
-  render: function () {
-    this.$el.empty();
-    this.collection.each(this.addPokemonToList, this);
+  render: function (options) {
+
+    var searchString = options['searchString'];
+    this.$el.find('.inner-list').empty();
+    if (!searchString) {
+      this.collection.each(this.addPokemonToList, this);
+    } else {
+      this.collection.each(function (pokemon) {
+        var pokeName = pokemon.get('name');
+        if (pokeName.indexOf(searchString) > -1) {
+          this.addPokemonToList(pokemon);
+        }
+      }.bind(this));
+    }
     return this;
   },
 
   selectPokemonFromList: function (event) {
     var li = $(event.currentTarget);
     var pokemonId = li.data("id");
-    // var pokemon = this.collection.get(pokemonId);
 
     Backbone.history.navigate("/pokemon/" + pokemonId, {trigger: true});
-    // var pokeDetail = new Pokedex.Views.PokemonDetail({model: pokemon});
-    // $("#pokedex .pokemon-detail").html(pokeDetail.$el);
-    // pokeDetail.refreshPokemon();
+  },
+
+  updateSearchParams: function(event) {
+    var searchString = $(event.currentTarget).val();
+    console.log(searchString);
+    this.refreshPokemon(searchString);
   }
 });
 

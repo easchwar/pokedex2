@@ -21,7 +21,7 @@ Pokedex.Router = Backbone.Router.extend({
 
   pokemonIndex: function (callback) {
     var pokeIndex = new Pokedex.Views.PokemonIndex();
-    pokeIndex.refreshPokemon(callback);
+    pokeIndex.refreshPokemon(null, callback);
     $("#pokedex .pokemon-list").html(pokeIndex.$el);
     this._pokemonIndex = pokeIndex;
     this.pokemonForm();
